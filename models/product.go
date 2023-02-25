@@ -16,6 +16,12 @@ type ProductStatistics struct {
 	Count int    `json:"count"`
 }
 
+type ProductStatisticsWithDate struct {
+	Name  string `json:"name"`
+	Date  string `json:"data"`
+	Count int    `json:"count"`
+}
+
 type GetAllProducts struct {
 	Products []Product `json:"products"`
 	Count    int       `json:"count"`

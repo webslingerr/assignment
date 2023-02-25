@@ -2,12 +2,14 @@ package controller
 
 import (
 	"app/models"
+
 	"errors"
 	"fmt"
+	"sort"
 	"time"
 )
 
-const LAYOUT = "2006-01-02"
+var LAYOUT string = "2006-01-02"
 
 func (c *Controller) CreateShopCart(req *models.CreateShopCart) error {
 	_, err := c.store.User().GetById(&models.UserPrimaryKey{Id: req.UserId})
@@ -86,6 +88,13 @@ func (c *Controller) ClientHistory(req *models.UserPrimaryKey) (string, []models
 			Time:  v.Time,
 		})
 	}
+
+	LAYOUT = "2006-01-02 15:04:05"
+	sort.Slice(clientHistory, func(i, j int) bool {
+		tm1, _ := time.Parse(LAYOUT, clientHistory[i].Time)
+		tm2, _ := time.Parse(LAYOUT, clientHistory[j].Time)
+		return tm1.Before(tm2)
+	})
 	return user.Name + " " + user.Surname, clientHistory, nil
 }
 

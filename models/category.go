@@ -1,5 +1,9 @@
 package models
 
+type CategoryPrimaryKey struct {
+	Id string `json:"id"`
+}
+
 type CategoryStatistics struct {
 	Name  string `json:"name"`
 	Count int    `json:"count"`

@@ -2,8 +2,9 @@ package jsonDb
 
 import (
 	"app/models"
-	"encoding/json"
 
+	"encoding/json"
+	"errors"
 	"io/ioutil"
 )
 
@@ -17,12 +18,17 @@ func NewCategoryRepo(fileName string) *categoryRepo {
 	}
 }
 
-func (c *categoryRepo) GetAll() ([]models.Category, error) {
+func (c *categoryRepo) GetById(req *models.CategoryPrimaryKey) (models.Category, error) {
 	categories, err := c.Read()
 	if err != nil {
-		return []models.Category{}, err
+		return models.Category{}, err
 	}
-	return categories, nil
+	for _, v := range categories {
+		if v.Id == req.Id {
+			return v, nil
+		}
+	} 
+	return models.Category{}, errors.New("There is no category with this id")
 }
 
 func (c *categoryRepo) Read() ([]models.Category, error) {

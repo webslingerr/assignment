@@ -40,5 +40,5 @@ type ProductRepoI interface {
 }
 
 type CategoryRepoI interface {
-	GetAll() ([]models.Category, error)
+	GetById(*models.CategoryPrimaryKey) (models.Category, error)
 }
