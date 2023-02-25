@@ -10,6 +10,7 @@ type StorageI interface {
 	ShopCart() ShopCartRepoI
 	User() UserRepoI
 	Product() ProductRepoI
+	Category() CategoryRepoI
 } 
 
 type BranchRepoI interface {
@@ -30,10 +31,14 @@ type ShopCartRepoI interface {
 
 type UserRepoI interface {
 	GetById(*models.UserPrimaryKey) (models.User, error)
-	Update(*models.UpdateUserBalance) error
+	GetAll() (models.GetAllUser, error)
 }
 
 type ProductRepoI interface {
 	GetById(*models.ProductPrimaryKey) (models.Product, error)
 	GetAllProducts() (models.GetAllProducts, error) 
+}
+
+type CategoryRepoI interface {
+	GetAll() ([]models.Category, error)
 }

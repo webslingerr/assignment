@@ -4,7 +4,6 @@ import (
 	"app/models"
 	"encoding/json"
 	"errors"
-	"os"
 
 	"io/ioutil"
 )
@@ -34,34 +33,15 @@ func (u *userRepo) GetById(req *models.UserPrimaryKey) (models.User, error) {
 	return models.User{}, errors.New("There is no user with this id")
 }
 
-func (u *userRepo) Update(req *models.UpdateUserBalance) error {
+func (u *userRepo) GetAll() (models.GetAllUser, error) {
 	users, err := u.Read()
 	if err != nil {
-		return err
+		return models.GetAllUser{}, err
 	}
-
-	flag := false
-	for i, v := range users {
-		if req.Id == v.Id {
-			users[i].Balance = req.Balance
-			flag = true
-		}
-	}
-
-	if !flag {
-		return errors.New("There is no user with this id")
-	}
-
-	body, err := json.MarshalIndent(users, "", " ")
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(u.fileName, body, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	
-	return nil
+	return models.GetAllUser{
+		Count: len(users),
+		Users: users,
+	}, nil
 }
 
 func (b *userRepo) Read() ([]models.User, error) {

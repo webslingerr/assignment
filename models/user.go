@@ -11,7 +11,12 @@ type User struct {
 	Balance int    `json:"balance"`
 }
 
-type UpdateUserBalance struct {
-	Id string `json:"id"`
-	Balance int `json:"balance"`
+type ActiveUser struct {
+	Name       string `json:"name"`
+	SpentMoney int    `json:"price"`
+}
+
+type GetAllUser struct {
+	Count int    `json:"count"`
+	Users []User `json:"users"`
 }

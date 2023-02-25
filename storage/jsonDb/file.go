@@ -12,6 +12,7 @@ type Store struct {
 	shopCart *shopCartRepo
 	user     *userRepo
 	product  *productRepo
+	category *categoryRepo
 }
 
 func NewFileJson(cfg *config.Config) (storage.StorageI, error) {
@@ -47,11 +48,20 @@ func NewFileJson(cfg *config.Config) (storage.StorageI, error) {
 		}
 	}
 
+	if !fileExists(cfg.CategoryFileName) {
+		os.Create(cfg.CategoryFileName)
+		err := ioutil.WriteFile(cfg.CategoryFileName, []byte("[]"), os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	return &Store{
 		branch:   NewBranchRepo(cfg.BranchFileName),
 		shopCart: NewShopCart(cfg.ShopCartFileName),
 		user:     NewUserRepo(cfg.UserFileName),
 		product:  NewProductRepo(cfg.ProductFileName),
+		category: NewCategoryRepo(cfg.CategoryFileName),
 	}, nil
 }
 
@@ -71,6 +81,10 @@ func (s *Store) User() storage.UserRepoI {
 
 func (s *Store) Product() storage.ProductRepoI {
 	return s.product
+}
+
+func (s *Store) Category() storage.CategoryRepoI {
+	return s.category
 }
 
 func fileExists(fileName string) bool {

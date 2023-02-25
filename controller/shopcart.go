@@ -3,6 +3,7 @@ package controller
 import (
 	"app/models"
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -41,12 +42,12 @@ func (c *Controller) GetAll(req *models.FilterShopCart) ([]models.ShopCart, erro
 		if tm1.After(tm2) {
 			return []models.ShopCart{}, errors.New("Invalid time. FromDate should be before ToDate")
 		}
-	} else if req.FromDate == "" {
+	} else if req.FromDate == "" && req.ToDate != "" {
 		_, err := time.Parse(LAYOUT, req.ToDate)
 		if err != nil {
 			return []models.ShopCart{}, err
 		}
-	} else if req.ToDate == "" {
+	} else if req.ToDate == "" && req.FromDate != "" {
 		_, err := time.Parse(LAYOUT, req.FromDate)
 		if err != nil {
 			return []models.ShopCart{}, err
@@ -126,6 +127,11 @@ func (c *Controller) CalculateTotalPrice(req *models.UserPrimaryKey) (int, error
 		return 0, err
 	}
 
+	if len(shopcarts) == 0 {
+		fmt.Println("There are no unpaid shopcarts of this client")
+		return 0, nil
+	}
+
 	total := 0
 	count := 0
 	minPrice := 1000000000000000000
@@ -141,10 +147,9 @@ func (c *Controller) CalculateTotalPrice(req *models.UserPrimaryKey) (int, error
 		}
 		total += v.Count * product.Price
 	}
-
+	
 	if count > 9 {
 		return total - minPrice, nil
 	}
-
 	return total, nil
 }
