@@ -1,14 +1,13 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/gin-gonic/gin"
-
 	"app/api"
 	"app/config"
 	"app/pkg/logger"
 	"app/storage/postgresql"
+	"fmt"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {

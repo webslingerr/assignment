@@ -24,6 +24,10 @@ func (r *reportRepo) SendProduct(ctx context.Context, req *models.SendProduct) e
 		senderStock int
 	)
 
+	if req.Quantity <= 0 {
+		return errors.New("Invalid quantity")
+	}
+
 	err := r.db.QueryRow(ctx,
 		`SELECT quantity FROM stocks WHERE store_id = $1 AND product_id = $2`,
 		req.SenderId,
@@ -180,6 +184,10 @@ func (r *reportRepo) OrderTotalSum(ctx context.Context, req *models.OrderTotalSu
 
 func (r *orderRepo) CheckStock(ctx context.Context, req *models.CreateOrderItem) error {
 	var quantity, store_id int
+
+	if req.Quantity <=0 {
+		return errors.New("Invalid quantity")
+	}
 
 	query := `
 		SELECT 

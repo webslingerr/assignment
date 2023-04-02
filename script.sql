@@ -1,7 +1,9 @@
-SELECT 
-    product_name,
-    list_price,
+select
+    ARRAY_AGG(product_name),
+    ARRAY_AGG(list_price),
+    ARRAY_AGG(quantity),
     store_name
-FROM products
-JOIN stocks USING(product_id)
-LEFT JOIN stores ON stores.store_id = stocks.store_id
+from stocks
+left join stores on stores.store_id = stocks.store_id
+left join products on products.product_id = stocks.product_id
+GROUP BY store_name
