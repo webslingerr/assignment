@@ -1311,6 +1311,13 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "offset",
                         "name": "offset",
                         "in": "query"
@@ -1393,6 +1400,13 @@
                 "summary": "Create Order",
                 "operationId": "create_order",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "CreateOrderRequest",
                         "name": "Order",
@@ -1478,6 +1492,13 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "id",
                         "name": "id",
                         "in": "path",
@@ -1555,6 +1576,13 @@
                 "summary": "Update Order",
                 "operationId": "update_order",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "id",
@@ -1643,6 +1671,13 @@
                 "summary": "Delete Order",
                 "operationId": "delete_order",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "id",
@@ -1734,6 +1769,13 @@
                 "operationId": "create_order_item",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "CreateOrderItemRequest",
                         "name": "order_item",
                         "in": "body",
@@ -1816,6 +1858,13 @@
                 "summary": "Delete Order Item",
                 "operationId": "delete_order_item",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "id",
@@ -2609,6 +2658,89 @@
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.PromocodePrimaryKey"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handler.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handler.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handler.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "description": "Create User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create User",
+                "operationId": "create_User",
+                "parameters": [
+                    {
+                        "description": "CreateUserRequest",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateUser"
                         }
                     }
                 ],
@@ -4448,6 +4580,17 @@
                     "type": "string"
                 },
                 "zip_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateUser": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

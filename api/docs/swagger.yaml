@@ -143,6 +143,13 @@ definitions:
       zip_code:
         type: string
     type: object
+  models.CreateUser:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   models.CustomerPrimaryKey:
     properties:
       customer_id:
@@ -1048,6 +1055,11 @@ paths:
       description: Get List Order
       operationId: get_list_order
       parameters:
+      - description: Password
+        in: header
+        name: Password
+        required: true
+        type: string
       - description: offset
         in: query
         name: offset
@@ -1095,6 +1107,11 @@ paths:
       description: Create Order
       operationId: create_order
       parameters:
+      - description: Password
+        in: header
+        name: Password
+        required: true
+        type: string
       - description: CreateOrderRequest
         in: body
         name: Order
@@ -1141,6 +1158,11 @@ paths:
       description: Delete Order
       operationId: delete_order
       parameters:
+      - description: Password
+        in: header
+        name: Password
+        required: true
+        type: string
       - description: id
         in: path
         name: id
@@ -1191,6 +1213,11 @@ paths:
       description: Get By ID Order
       operationId: get_by_id_order
       parameters:
+      - description: Password
+        in: header
+        name: Password
+        required: true
+        type: string
       - description: id
         in: path
         name: id
@@ -1235,6 +1262,11 @@ paths:
       description: Update Order
       operationId: update_order
       parameters:
+      - description: Password
+        in: header
+        name: Password
+        required: true
+        type: string
       - description: id
         in: path
         name: id
@@ -1286,6 +1318,11 @@ paths:
       description: Create Order Item
       operationId: create_order_item
       parameters:
+      - description: Password
+        in: header
+        name: Password
+        required: true
+        type: string
       - description: CreateOrderItemRequest
         in: body
         name: order_item
@@ -1332,6 +1369,11 @@ paths:
       description: Delete Order Item
       operationId: delete_order_item
       parameters:
+      - description: Password
+        in: header
+        name: Password
+        required: true
+        type: string
       - description: id
         in: path
         name: id
@@ -1815,6 +1857,52 @@ paths:
       summary: Get By ID Promocode
       tags:
       - Promocode
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create User
+      operationId: create_User
+      parameters:
+      - description: CreateUserRequest
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create User
+      tags:
+      - User
   /report/send_product:
     put:
       consumes:

@@ -1323,6 +1323,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "offset",
                         "name": "offset",
                         "in": "query"
@@ -1405,6 +1412,13 @@ const docTemplate = `{
                 "summary": "Create Order",
                 "operationId": "create_order",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "CreateOrderRequest",
                         "name": "Order",
@@ -1490,6 +1504,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "id",
                         "name": "id",
                         "in": "path",
@@ -1567,6 +1588,13 @@ const docTemplate = `{
                 "summary": "Update Order",
                 "operationId": "update_order",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "id",
@@ -1655,6 +1683,13 @@ const docTemplate = `{
                 "summary": "Delete Order",
                 "operationId": "delete_order",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "id",
@@ -1746,6 +1781,13 @@ const docTemplate = `{
                 "operationId": "create_order_item",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "CreateOrderItemRequest",
                         "name": "order_item",
                         "in": "body",
@@ -1828,6 +1870,13 @@ const docTemplate = `{
                 "summary": "Delete Order Item",
                 "operationId": "delete_order_item",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "id",
@@ -2621,6 +2670,89 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.PromocodePrimaryKey"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handler.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handler.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handler.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "description": "Create User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create User",
+                "operationId": "create_User",
+                "parameters": [
+                    {
+                        "description": "CreateUserRequest",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateUser"
                         }
                     }
                 ],
@@ -4460,6 +4592,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "zip_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateUser": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

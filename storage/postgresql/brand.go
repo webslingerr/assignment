@@ -24,7 +24,7 @@ func (b *brandRepo) Create(ctx context.Context, req *models.CreateBrand) (int, e
 		id    int
 	)
 
-	err := b.db.QueryRow(ctx, `SELECT MAX(brand_id)+1 FROM brands`).Scan(
+	err := b.db.QueryRow(ctx, `SELECT COALESCE(MAX(brand_id), 0) + 1 FROM brands`).Scan(
 		&id,
 	)
 	if err != nil {

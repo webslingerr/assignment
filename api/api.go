@@ -12,9 +12,15 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewApi(r *gin.Engine, cfg *config.Config, store storage.StorageI, logger logger.LoggerI) {
+func NewApi(r *gin.Engine, cfg *config.Config, store storage.StorageI, cache storage.StorageCacheI, logger logger.LoggerI) {
 
-	handler := handler.NewHandler(cfg, store, logger)
+	handler := handler.NewHandler(cfg, store, cache, logger)
+
+	v1 := r.Group("/v1")
+	v1.Use(handler.AuthMiddleware())
+
+	r.POST("/register", handler.RegisterUser)
+	r.POST("/login", handler.LoginUser)
 
 	r.POST("/category", handler.CreateCategory)
 	r.GET("/category/:id", handler.GetByIdCategory)
@@ -57,9 +63,9 @@ func NewApi(r *gin.Engine, cfg *config.Config, store storage.StorageI, logger lo
 	r.PUT("/staff/:id", handler.UpdateStaff)
 	r.DELETE("/staff/:id", handler.DeleteStaff)
 
-	r.POST("/order", handler.CreateOrder)
-	r.GET("/order/:id", handler.GetByIdOrder)
-	r.GET("/order", handler.GetListOrder)
+	r.POST("/order", handler.AuthMiddleware(), handler.CreateOrder)
+	r.GET("/order/:id", handler.AuthMiddleware(), handler.GetByIdOrder)
+	r.GET("/order", handler.AuthMiddleware(), handler.GetListOrder)
 	r.PUT("/order/:id", handler.UpdateOrder)
 	r.DELETE("/order/:id", handler.DeleteOrder)
 	r.POST("/order_item", handler.CreateOrderItem)

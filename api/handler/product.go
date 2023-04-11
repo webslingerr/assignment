@@ -3,6 +3,7 @@ package handler
 import (
 	"app/api/models"
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -17,14 +18,15 @@ import (
 // @Tags Product
 // @Accept json
 // @Produce json
-// @Param Product body models.CreateProduct true "CreateProductRequest"
-// @Success 200 {object} Response{data=string} "Success Request"
+// @Param product body models.CreateProduct true "CreateProductRequest"
+// @Success 201 {object} Response{data=string} "Success Request"
 // @Response 400 {object} Response{data=string} "Bad Request"
 // @Failure 500 {object} Response{data=string} "Server Error"
 func (h *Handler) CreateProduct(c *gin.Context) {
+
 	var createProduct models.CreateProduct
 
-	err := c.ShouldBindJSON(&createProduct)
+	err := c.ShouldBindJSON(&createProduct) // parse req body to given type struct
 	if err != nil {
 		h.handlerResponse(c, "create product", http.StatusBadRequest, err.Error())
 		return
@@ -32,17 +34,17 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 
 	id, err := h.storages.Product().Create(context.Background(), &createProduct)
 	if err != nil {
-		h.handlerResponse(c, "storage create product", http.StatusInternalServerError, err.Error())
+		h.handlerResponse(c, "storage.product.create", http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	product, err := h.storages.Product().GetById(context.Background(), &models.ProductPrimaryKey{ProductId: id})
+	resp, err := h.storages.Product().GetById(context.Background(), &models.ProductPrimaryKey{ProductId: id})
 	if err != nil {
-		h.handlerResponse(c, "storage get by id product", http.StatusInternalServerError, err.Error())
+		h.handlerResponse(c, "storage.product.getByID", http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	h.handlerResponse(c, "create product", http.StatusCreated, product)
+	h.handlerResponse(c, "create product", http.StatusCreated, resp)
 }
 
 // Get By ID Product godoc
@@ -58,20 +60,22 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 // @Response 400 {object} Response{data=string} "Bad Request"
 // @Failure 500 {object} Response{data=string} "Server Error"
 func (h *Handler) GetByIdProduct(c *gin.Context) {
+
 	id := c.Param("id")
+
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		h.handlerResponse(c, "Atoi err get by id product", http.StatusBadRequest, err.Error())
+		h.handlerResponse(c, "storage.product.getByID", http.StatusBadRequest, "id incorrect")
 		return
 	}
 
-	product, err := h.storages.Product().GetById(context.Background(), &models.ProductPrimaryKey{ProductId: idInt})
+	resp, err := h.storages.Product().GetById(context.Background(), &models.ProductPrimaryKey{ProductId: idInt})
 	if err != nil {
-		h.handlerResponse(c, "Storage get by id product", http.StatusInternalServerError, err.Error())
+		h.handlerResponse(c, "storage.product.getByID", http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	h.handlerResponse(c, "Get by id product", http.StatusOK, product)
+	h.handlerResponse(c, "get product by id", http.StatusCreated, resp)
 }
 
 // Get List Product godoc
@@ -89,15 +93,35 @@ func (h *Handler) GetByIdProduct(c *gin.Context) {
 // @Response 400 {object} Response{data=string} "Bad Request"
 // @Failure 500 {object} Response{data=string} "Server Error"
 func (h *Handler) GetListProduct(c *gin.Context) {
+
 	offset, err := h.getOffsetQuery(c.Query("offset"))
 	if err != nil {
-		h.handlerResponse(c, "Get list product", http.StatusBadRequest, "invalid offset")
+		h.handlerResponse(c, "get list product", http.StatusBadRequest, "invalid offset")
 		return
 	}
 
 	limit, err := h.getLimitQuery(c.Query("limit"))
 	if err != nil {
-		h.handlerResponse(c, "Get list product", http.StatusBadRequest, "invalid limit")
+		h.handlerResponse(c, "get list product", http.StatusBadRequest, "invalid limit")
+		return
+	}
+
+	r := fmt.Sprintf("%v-%v-%s", offset, limit, c.Query("search"))
+
+	exists, err := h.cache.Product().Exists(r)
+	if err != nil {
+		h.handlerResponse(c, "cache.product.exists", http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if exists {
+		resp, err := h.cache.Product().GetAll(r)
+		if err != nil {
+			h.handlerResponse(c, "cache.product.get all", http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		h.handlerResponse(c, "get list product response from redis", http.StatusOK, resp)
 		return
 	}
 
@@ -106,15 +130,22 @@ func (h *Handler) GetListProduct(c *gin.Context) {
 		Limit:  limit,
 		Search: c.Query("search"),
 	})
+
+	err = h.cache.Product().Create(r, resp)
 	if err != nil {
-		h.handlerResponse(c, "Storage get list product", http.StatusInternalServerError, err.Error())
+		h.handlerResponse(c, "cache.product.create", http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	h.handlerResponse(c, "Get list product", http.StatusOK, resp)
+	if err != nil {
+		h.handlerResponse(c, "storage.product.getlist", http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	h.handlerResponse(c, "get list product response from postgres", http.StatusOK, resp)
 }
 
-// Get Update Product godoc
+// Update Product godoc
 // @ID update_product
 // @Router /product/{id} [PUT]
 // @Summary Update Product
@@ -123,48 +154,51 @@ func (h *Handler) GetListProduct(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
-// @Param Product body models.UpdateProduct true "UpdateProductRequest"
-// @Success 200 {object} Response{data=string} "Success Request"
+// @Param product body models.UpdateProduct true "UpdateProductRequest"
+// @Success 202 {object} Response{data=string} "Success Request"
 // @Response 400 {object} Response{data=string} "Bad Request"
 // @Failure 500 {object} Response{data=string} "Server Error"
 func (h *Handler) UpdateProduct(c *gin.Context) {
+
 	var updateProduct models.UpdateProduct
 
 	id := c.Param("id")
-	idInt, err := strconv.Atoi(id)
+
+	err := c.ShouldBindJSON(&updateProduct)
 	if err != nil {
-		h.handlerResponse(c, "Atoi update product", http.StatusBadRequest, err.Error())
+		h.handlerResponse(c, "update product", http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err = c.ShouldBindJSON(&updateProduct)
+	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		h.handlerResponse(c, "Update product", http.StatusBadRequest, err.Error())
+		h.handlerResponse(c, "storage.product.getByID", http.StatusBadRequest, "id incorrect")
 		return
 	}
+
 	updateProduct.ProductId = idInt
 
 	rowsAffected, err := h.storages.Product().Update(context.Background(), &updateProduct)
 	if err != nil {
-		h.handlerResponse(c, "Storage update product", http.StatusInternalServerError, err.Error())
+		h.handlerResponse(c, "storage.product.update", http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	if rowsAffected <= 0 {
-		h.handlerResponse(c, "Storage update product", http.StatusBadRequest, "no rows affected")
+		h.handlerResponse(c, "storage.product.update", http.StatusBadRequest, "now rows affected")
 		return
 	}
 
 	resp, err := h.storages.Product().GetById(context.Background(), &models.ProductPrimaryKey{ProductId: idInt})
 	if err != nil {
-		h.handlerResponse(c, "Storage get by id product", http.StatusInternalServerError, err.Error())
+		h.handlerResponse(c, "storage.product.getByID", http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	h.handlerResponse(c, "Update product", http.StatusOK, resp)
+	h.handlerResponse(c, "update product", http.StatusAccepted, resp)
 }
 
-// Delete Product godoc
+// DELETE Product godoc
 // @ID delete_product
 // @Router /product/{id} [DELETE]
 // @Summary Delete Product
@@ -173,28 +207,29 @@ func (h *Handler) UpdateProduct(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
-// @Param Product body models.ProductPrimaryKey true "DeleteProductRequest"
-// @Success 200 {object} Response{data=string} "Success Request"
+// @Param product body models.ProductPrimaryKey true "DeleteProductRequest"
+// @Success 204 {object} Response{data=string} "Success Request"
 // @Response 400 {object} Response{data=string} "Bad Request"
 // @Failure 500 {object} Response{data=string} "Server Error"
 func (h *Handler) DeleteProduct(c *gin.Context) {
+
 	id := c.Param("id")
+
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		h.handlerResponse(c, "Atoi delete product", http.StatusBadRequest, err.Error())
+		h.handlerResponse(c, "storage.product.getByID", http.StatusBadRequest, "id incorrect")
 		return
 	}
 
 	rowsAffected, err := h.storages.Product().Delete(context.Background(), &models.ProductPrimaryKey{ProductId: idInt})
 	if err != nil {
-		h.handlerResponse(c, "Storage delete product", http.StatusInternalServerError, err.Error())
+		h.handlerResponse(c, "storage.product.delete", http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	if rowsAffected <= 0 {
-		h.handlerResponse(c, "Storage delete product", http.StatusBadRequest, "no rows affected")
+		h.handlerResponse(c, "storage.product.delete", http.StatusBadRequest, "now rows affected")
 		return
 	}
 
-	h.handlerResponse(c, "Delete customer", http.StatusNoContent, "Deleted Successfully")
+	h.handlerResponse(c, "delete product", http.StatusNoContent, nil)
 }

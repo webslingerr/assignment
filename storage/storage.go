@@ -18,6 +18,7 @@ type StorageI interface {
 	Order() OrderRepoI
 	Promocode() PromocodeRepoI
 	Report() ReportRepoI
+	User() UserRepoI
 }
 
 type CategoryRepoI interface {
@@ -98,4 +99,9 @@ type ReportRepoI interface {
 	SendProduct(context.Context, *models.SendProduct) error
 	StaffReport(context.Context, *models.StaffListRequest) (*models.StaffListResponse, error)
 	OrderTotalSum(context.Context, *models.OrderTotalSum) (string, error)
+}
+
+type UserRepoI interface {
+	Create(context.Context, *models.CreateUser) (string, error)
+	GetById(context.Context, *models.LoginUser) (bool, error)
 }

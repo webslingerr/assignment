@@ -17,6 +17,7 @@ import (
 // @Tags Order
 // @Accept json
 // @Produce json
+// @Param Password header string true "Password"
 // @Param Order body models.CreateOrder true "CreateOrderRequest"
 // @Success 200 {object} Response{data=string} "Success Request"
 // @Response 400 {object} Response{data=string} "Bad Request"
@@ -43,7 +44,7 @@ func (h *Handler) CreateOrder(c *gin.Context) {
 	}
 
 	h.handlerResponse(c, "create order", http.StatusCreated, staff)
-} 
+}
 
 // Get By ID Order godoc
 // @ID get_by_id_order
@@ -53,6 +54,7 @@ func (h *Handler) CreateOrder(c *gin.Context) {
 // @Tags Order
 // @Accept json
 // @Produce json
+// @Param Password header string true "Password"
 // @Param id path string true "id"
 // @Success 200 {object} Response{data=string} "Success Request"
 // @Response 400 {object} Response{data=string} "Bad Request"
@@ -82,6 +84,7 @@ func (h *Handler) GetByIdOrder(c *gin.Context) {
 // @Tags Order
 // @Accept json
 // @Produce json
+// @Param Password header string true "Password"
 // @Param offset query string false "offset"
 // @Param limit query string false "limit"
 // @Success 200 {object} Response{data=string} "Success Request"
@@ -120,6 +123,7 @@ func (h *Handler) GetListOrder(c *gin.Context) {
 // @Tags Order
 // @Accept json
 // @Produce json
+// @Param Password header string true "Password"
 // @Param id path string true "id"
 // @Param Order body models.UpdateOrder true "UpdateOrderRequest"
 // @Success 200 {object} Response{data=string} "Success Request"
@@ -138,7 +142,7 @@ func (h *Handler) UpdateOrder(c *gin.Context) {
 	err = c.ShouldBindJSON(&updateOrder)
 	if err != nil {
 		h.handlerResponse(c, "Update order", http.StatusBadRequest, err.Error())
-		return 
+		return
 	}
 	updateOrder.OrderId = idInt
 
@@ -170,6 +174,7 @@ func (h *Handler) UpdateOrder(c *gin.Context) {
 // @Tags Order
 // @Accept json
 // @Produce json
+// @Param Password header string true "Password"
 // @Param id path string true "id"
 // @Param Order body models.OrderPrimaryKey true "DeleteOrderRequest"
 // @Success 200 {object} Response{data=string} "Success Request"
@@ -205,6 +210,7 @@ func (h *Handler) DeleteOrder(c *gin.Context) {
 // @Tags Order
 // @Accept json
 // @Produce json
+// @Param Password header string true "Password"
 // @Param order_item body models.CreateOrderItem true "CreateOrderItemRequest"
 // @Success 201 {object} Response{data=string} "Success Request"
 // @Response 400 {object} Response{data=string} "Bad Request"
@@ -213,7 +219,7 @@ func (h *Handler) CreateOrderItem(c *gin.Context) {
 
 	var createOrderItem models.CreateOrderItem
 
-	err := c.ShouldBindJSON(&createOrderItem) 
+	err := c.ShouldBindJSON(&createOrderItem)
 	if err != nil {
 		h.handlerResponse(c, "Create order item", http.StatusBadRequest, err.Error())
 		return
@@ -242,6 +248,7 @@ func (h *Handler) CreateOrderItem(c *gin.Context) {
 // @Tags Order
 // @Accept json
 // @Produce json
+// @Param Password header string true "Password"
 // @Param id path string true "id"
 // @Param item_id query string true "item_id"
 // @Param orderItem body models.OrderItemPrimaryKey true "DeleteOrderItemRequest"

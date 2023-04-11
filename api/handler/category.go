@@ -164,6 +164,8 @@ func (h *Handler) UpdateCategory(c *gin.Context) {
 	h.handlerResponse(c, "Update category", http.StatusOK, resp)
 }
 
+
+
 // Delete Category godoc
 // @ID delete_category
 // @Router /category/{id} [DELETE]
